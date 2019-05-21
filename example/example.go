@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"time"
 
-	"github.com/hellomrleeus/gobreaker/agent"
+	"github.com/hellomrleeus/gobreaker-agent/agent"
 )
 
 var as *agent.Agents
@@ -23,8 +24,8 @@ func init() {
 			},
 			Timeout: 10 * time.Second,
 		},
-		Limit: 0.5,
-		Burst: 2,
+		Limit: 0.2,
+		Burst: 3,
 	}
 	as = agent.NewAgents()
 	as.M.Store(name, agent.NewAgent(config))
@@ -33,7 +34,7 @@ func init() {
 func fakeGet() (interface{}, error) {
 	time.Sleep(time.Second)
 	n := rand.Intn(3)
-	if n < 1 {
+	if n < 2 {
 		return "success", nil
 	}
 	return nil, errors.New("fail")
@@ -42,15 +43,16 @@ func fakeGet() (interface{}, error) {
 func main() {
 	ag, ok := as.M.Load("MOCK_GET")
 	if !ok {
-		fmt.Println("??")
+		log.Fatalf("??")
 	}
 
 	t := ag.(*agent.Agent)
 	cb := t.Breaker
 	l := t.Limiter
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 100; i++ {
 		go func() {
 			body, err := cb.Execute(context.TODO(), l, func() (interface{}, error) {
+
 				resp, err := fakeGet()
 				if err != nil {
 					return nil, err

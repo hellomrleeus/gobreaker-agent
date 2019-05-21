@@ -3,7 +3,7 @@ package agent
 import (
 	"sync"
 
-	gobreaker "github.com/hellomrleeus/gobreaker/breaker"
+	"github.com/hellomrleeus/gobreaker-agent/breaker"
 )
 
 //Agents Agent集合
@@ -16,36 +16,33 @@ func NewAgents() *Agents {
 	return &Agents{}
 }
 
-//Settings gobreaker.Settings 别名
-type Settings = gobreaker.Settings
+//Settings breaker.Settings 别名
+type Settings = breaker.Settings
 
-//Limit gobreaker.Limit 别名
-//type Limit = gobreaker.Limit
-
-//Counts gobreaker.Counts 别名
-type Counts = gobreaker.Counts
+//Counts breaker.Counts 别名
+type Counts = breaker.Counts
 
 //Config Agent配置项
-//Settings 组合自gobreaker.Settings
-//Limit, Burst 组合自gobreaker.Limit
+//Settings 组合自breaker.Settings
+//Limit, Burst 组合自breaker.Limit
 type Config struct {
 	Settings Settings
-	Limit    float64
+	Limit    breaker.Limit
 	Burst    int
 }
 
 //Agent 请求代理
 type Agent struct {
 	Name    string
-	Breaker *gobreaker.CircuitBreaker
-	Limiter *gobreaker.Limiter
+	Breaker *breaker.CircuitBreaker
+	Limiter *breaker.Limiter
 }
 
 //NewAgent 初始化
 func NewAgent(c Config) *Agent {
 	return &Agent{
 		Name:    c.Settings.Name,
-		Breaker: gobreaker.NewCircuitBreaker(gobreaker.Settings(c.Settings)),
-		Limiter: gobreaker.NewLimiter(c.Limit, c.Burst),
+		Breaker: breaker.NewCircuitBreaker(breaker.Settings(c.Settings)),
+		Limiter: breaker.NewLimiter(c.Limit, c.Burst),
 	}
 }

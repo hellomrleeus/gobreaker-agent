@@ -1,4 +1,3 @@
-// Package gobreaker implements the Circuit Breaker pattern.
 // See https://msdn.microsoft.com/en-us/library/dn589784.aspx.
 package breaker
 
